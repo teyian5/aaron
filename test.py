@@ -56,6 +56,12 @@ else:
 
             # 遍历Markdown内容的每一行，找到插入点
             for line in lines:
+                # 替换中文括号为英文括号
+                line = line.replace('（', '(').replace('）', ')')
+
+                # 替换 (  ) 为 ($\qquad$)
+                line = re.sub(r'\(\s*\)', r'($\\qquad$)', line)
+
                 # 删除小标题开头的 `-`
                 if line.strip().startswith('- '):
                     line = line.lstrip('- ').strip()  # 去掉开头的 `-` 和多余的空格
@@ -63,6 +69,10 @@ else:
                 # 检查是否是题号的插入点
                 match = re.match(r'^(\d+)\.', line.strip())
                 if match:
+                    # 在题号行之前插入一个空行（如果上一行不是空行）
+                    if new_lines and new_lines[-1].strip() != "":
+                        new_lines.append("")  # 插入空行
+
                     question_number = match.group(1)  # 提取题号
                     image_count[question_number] = 0  # 初始化该题的图片计数
                     new_lines.append(line)  # 先将题干行加入新内容
